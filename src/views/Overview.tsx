@@ -17,12 +17,29 @@ function Stat({ label, value, sub, children }: { label: string; value: string; s
   )
 }
 
-function CountPill({ label, value }: { label: string; value: number }) {
+// Every order lands in exactly one segment, so the bar always adds up to the Orders total.
+function OrderBreakdown({ segments, total }: { segments: { label: string; value: number; color: string }[]; total: number }) {
+  const shown = segments.filter((s) => s.value > 0)
+  if (!total) return null
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm text-slate-600">
-      {label}
-      <b className="font-semibold tabular-nums text-slate-800">{fmtInt(value)}</b>
-    </span>
+    <div className="border-t border-slate-100 px-4 py-4">
+      <div className="mb-2.5 text-xs font-medium uppercase tracking-wide text-slate-500">All orders by status</div>
+      <div className="flex h-2.5 gap-0.5 overflow-hidden rounded-full">
+        {shown.map((s) => (
+          <div key={s.label} className={s.color} style={{ width: `${(s.value / total) * 100}%` }} title={`${s.label}: ${fmtInt(s.value)}`} />
+        ))}
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 lg:grid-cols-5">
+        {shown.map((s) => (
+          <div key={s.label} className="flex items-center gap-2 text-sm">
+            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${s.color}`} aria-hidden />
+            <span className="whitespace-nowrap text-slate-600">{s.label}</span>
+            <span className="ml-auto font-semibold tabular-nums text-slate-800 sm:ml-0">{fmtInt(s.value)}</span>
+            <span className="hidden text-xs tabular-nums text-slate-400 sm:inline">{fmtPct(s.value / total)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -71,15 +88,17 @@ export function Overview({ records, products, asOf, onOpenStuck }: {
           />
           <Stat label="Replacement kits" value={fmtInt(s.replaced)} sub="Orders that needed a new kit" />
         </div>
-        {s.no_kit + s.cancelled + s.refunded + s.other > 0 && (
-          <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 px-4 py-3">
-            <span className="mr-1 text-xs font-medium uppercase tracking-wide text-slate-500">Not in the kit pipeline</span>
-            {s.no_kit > 0 && <CountPill label="Upload only" value={s.no_kit} />}
-            {s.cancelled > 0 && <CountPill label="Cancelled" value={s.cancelled} />}
-            {s.refunded > 0 && <CountPill label="Refunded" value={s.refunded} />}
-            {s.other > 0 && <CountPill label="Other status" value={s.other} />}
-          </div>
-        )}
+        <OrderBreakdown
+          total={s.total}
+          segments={[
+            { label: 'In progress', value: s.active, color: 'bg-indigo-500' },
+            { label: 'Report ready', value: s.complete, color: 'bg-emerald-500' },
+            { label: 'Upload only', value: s.no_kit, color: 'bg-slate-400' },
+            { label: 'Cancelled', value: s.cancelled, color: 'bg-amber-400' },
+            { label: 'Refunded', value: s.refunded, color: 'bg-rose-400' },
+            { label: 'Other status', value: s.other, color: 'bg-slate-300' },
+          ]}
+        />
       </section>
 
       <div className="grid gap-4 xl:grid-cols-2">
