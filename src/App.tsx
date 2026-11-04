@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FilterBar } from './components/FilterBar'
 import { loadDataset, type Dataset } from './data/model'
 import { applyFilters, EMPTY_FILTERS, stuckRows, type Filters } from './data/selectors'
+import { fmtDate } from './lib/format'
 import { readUrl, writeUrl, type Tab } from './lib/url'
 import { DataView } from './views/DataView'
 import { OrderDetail } from './views/OrderDetail'
@@ -90,6 +91,10 @@ export default function App() {
                     Back to sample
                   </button>
                 )}
+              </p>
+              <p className="mt-0.5 text-xs text-slate-400">
+                <span className="font-medium text-slate-500">As of {fmtDate(asOf)}</span>
+                {' · '}days waiting and stuck kits are counted up to the latest date in the data, not today
               </p>
             </div>
           </div>
