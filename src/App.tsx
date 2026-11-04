@@ -84,17 +84,35 @@ export default function App() {
             </div>
             <div>
               <h1 className="text-lg font-semibold leading-tight">Kit Lifecycle Dashboard</h1>
-              <p className="text-sm text-slate-500">
-                {dataset.label}
+              <p className="flex flex-wrap items-center gap-x-1.5 text-sm text-slate-500">
+                <span>{dataset.label}</span>
+                <span aria-hidden>·</span>
+                <span className="group relative inline-flex items-center gap-1">
+                  As of {fmtDate(asOf)}
+                  <button
+                    type="button"
+                    className="rounded-full text-slate-400 outline-none hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-indigo-400"
+                    aria-label="What does the as-of date mean?"
+                    aria-describedby="as-of-help"
+                  >
+                    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
+                      <circle cx="8" cy="8" r="6.25" />
+                      <path d="M8 7.25v3.5M8 5.25v.01" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                  <span
+                    id="as-of-help"
+                    role="tooltip"
+                    className="pointer-events-none absolute left-0 top-6 z-30 w-64 rounded-lg bg-slate-900 px-3 py-2 text-xs leading-relaxed text-white opacity-0 shadow-lg transition group-focus-within:opacity-100 group-hover:opacity-100"
+                  >
+                    Days waiting and stuck kits are counted up to this date: the latest date in the data, not today.
+                  </span>
+                </span>
                 {dataset !== sample && (
-                  <button type="button" className="ml-2 font-medium text-indigo-600 hover:underline" onClick={() => sample && switchDataset(sample)}>
+                  <button type="button" className="font-medium text-indigo-600 hover:underline" onClick={() => sample && switchDataset(sample)}>
                     Back to sample
                   </button>
                 )}
-              </p>
-              <p className="mt-0.5 text-xs text-slate-400">
-                <span className="font-medium text-slate-500">As of {fmtDate(asOf)}</span>
-                {' · '}days waiting and stuck kits are counted up to the latest date in the data, not today
               </p>
             </div>
           </div>
